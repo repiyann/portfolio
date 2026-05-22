@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '../ui/collapsible'
+
 	interface Experience {
 		role: string
 		company: string
@@ -48,7 +50,8 @@
 		</p>
 	</div>
 
-	<div class="mt-12 space-y-0">
+	<!-- Desktop timeline view (hidden on mobile) -->
+	<div class="mt-12 hidden space-y-0 md:block">
 		{#each experiences as experience (experience.company)}
 			<div class="relative pb-12 pl-8 last:pb-0">
 				<div class="absolute top-2 left-0 h-full w-0.5 bg-gray-400"></div>
@@ -75,6 +78,33 @@
 					</ul>
 				</div>
 			</div>
+		{/each}
+	</div>
+
+	<!-- Mobile accordion view (shown only on mobile) -->
+	<div class="mt-12 space-y-3 md:hidden">
+		{#each experiences as experience (experience.company)}
+			<Collapsible>
+				<CollapsibleTrigger class="justify-between">
+					<div class="flex flex-col gap-1">
+						<span class="font-semibold text-foreground">{experience.role}</span>
+						<span class="text-sm text-muted-foreground">{experience.company}</span>
+					</div>
+				</CollapsibleTrigger>
+				<CollapsibleContent>
+					<div class="space-y-2">
+						<p class="text-xs text-muted-foreground">{experience.duration}</p>
+						<ul class="space-y-2">
+							{#each experience.contributions as contribution (contribution)}
+								<li class="flex items-start gap-2 text-sm text-muted-foreground">
+									<span class="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-muted-foreground"></span>
+									{contribution}
+								</li>
+							{/each}
+						</ul>
+					</div>
+				</CollapsibleContent>
+			</Collapsible>
 		{/each}
 	</div>
 </section>
