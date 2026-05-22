@@ -13,32 +13,7 @@
 		link: '/'
 	}
 
-	const blogs: BlogPost[] = [
-		{
-			title: 'Building Scalable Next.js Applications',
-			description:
-				'A deep dive into architectural patterns and best practices for building production-ready Next.js applications at scale. Learn about caching strategies, code splitting, and performance optimization.',
-			tags: ['Next.js', 'Performance', 'Architecture'],
-			datePublished: 'December 15, 2024',
-			link: '/'
-		},
-		{
-			title: 'React Server Components: The Future of Web Development',
-			description:
-				'Exploring the paradigm shift with React Server Components. This article covers how RSCs reduce JavaScript bundle size and improve application performance.',
-			tags: ['React', 'Server Components', 'Performance'],
-			datePublished: 'November 28, 2024',
-			link: '/'
-		},
-		{
-			title: 'TypeScript Tips for Fullstack Developers',
-			description:
-				'Essential TypeScript patterns and tips that every fullstack developer should know. From utility types to advanced type inference, level up your TypeScript game.',
-			tags: ['TypeScript', 'Best Practices', 'Development'],
-			datePublished: 'November 10, 2024',
-			link: '/'
-		}
-	]
+	const blogs: BlogPost[] = []
 </script>
 
 <section class="py-5">

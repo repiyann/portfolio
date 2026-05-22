@@ -16,41 +16,30 @@
 
 	const projects: Project[] = [
 		{
-			title: 'E-commerce Platform',
+			title: 'Umima.clean Management System',
 			description:
-				'A full-featured e-commerce platform built with Next.js and PostgreSQL. Features include product catalog, shopping cart, payment integration, and admin dashboard.',
-			thumbnail:
-				'https://images.unsplash.com/photo-1460925895917-adf4e7e2ed0e?w=600&h=400&fit=crop',
-			tags: ['Next.js', 'React', 'PostgreSQL', 'Stripe'],
-			datePublished: 'June 2024',
+				'A fullstack web application developed for an undergraduate thesis project focused on shoe laundry service management. Built using AdonisJS with features for order management, customer data handling, and service tracking.',
+			thumbnail: '/projects/umima-clean.png',
+			tags: ['AdonisJS', 'TypeScript', 'PostgreSQL', 'Tailwind CSS'],
+			datePublished: '2025',
 			link: '/'
 		},
 		{
-			title: 'Task Management App',
+			title: 'Personal Portfolio Website',
 			description:
-				'A collaborative task management application with real-time updates. Supports team collaboration, task prioritization, and progress tracking with a modern UI.',
-			thumbnail: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=400&fit=crop',
-			tags: ['React', 'TypeScript', 'Firebase', 'Tailwind'],
-			datePublished: 'April 2024',
+				'A minimalist and responsive personal portfolio website built with Svelte to showcase projects, technical experience, and development journey.',
+			thumbnail: '/projects/portfolio.png',
+			tags: ['Svelte', 'TypeScript', 'Tailwind CSS'],
+			datePublished: '2025',
 			link: '/'
 		},
 		{
-			title: 'AI Chat Assistant',
+			title: 'Fedora Development Dotfiles',
 			description:
-				'An intelligent chat assistant powered by AI. Built with streaming capabilities, markdown support, and conversation history. Perfect for customer support and automation.',
-			thumbnail:
-				'https://images.unsplash.com/photo-1677442d019cecf8c5ee9a2d4a87d5c76a3f3e6d?w=600&h=400&fit=crop',
-			tags: ['Next.js', 'AI SDK', 'OpenAI', 'TypeScript'],
-			datePublished: 'February 2024',
-			link: '/'
-		},
-		{
-			title: 'Design System',
-			description:
-				'A comprehensive design system and component library built with React. Includes 50+ components, documentation, and Storybook integration for seamless UI development.',
-			thumbnail: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop',
-			tags: ['React', 'Storybook', 'CSS-in-JS', 'Figma'],
-			datePublished: 'January 2024',
+				'A personal dotfiles repository containing terminal, shell, and development environment configurations with an automated install.sh setup script for Fedora-based systems.',
+			thumbnail: '/projects/dotfiles.png',
+			tags: ['Bash', 'Linux', 'Fedora'],
+			datePublished: '2024',
 			link: '/'
 		}
 	]

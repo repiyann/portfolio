@@ -8,33 +8,33 @@
 
 	const experiences: Experience[] = [
 		{
-			role: 'Senior Fullstack Developer',
-			company: 'TechCorp Inc.',
-			duration: '2024 - Present',
+			role: 'Fullstack Developer Intern',
+			company: 'PT. Sumapala Integrasi Solusi',
+			duration: 'Apr 2025 - Jul 2025',
 			contributions: [
-				'Led the development of a microservices architecture serving 1M+ users',
-				'Reduced page load times by 60% through performance optimizations',
-				'Mentored junior developers and established coding standards'
-			]
-		},
-		{
-			role: 'Fullstack Developer',
-			company: 'StartupXYZ',
-			duration: '2022 - 2024',
-			contributions: [
-				'Built and shipped 5 major product features from concept to production',
-				'Implemented CI/CD pipelines reducing deployment time by 80%',
-				'Collaborated with design team to improve UX across the platform'
+				'Implemented role-based access control (RBAC) for internal web applications',
+				'Integrated deck.gl to visualize geospatial data for Kabupaten Bandung',
+				'Collaborated with frontend and backend teams to develop and maintain application features'
 			]
 		},
 		{
 			role: 'Frontend Developer',
-			company: 'Digital Agency',
-			duration: '2020 - 2022',
+			company: 'Freelance',
+			duration: 'Jun 2024 - Jul 2024',
 			contributions: [
-				'Developed responsive web applications for Fortune 500 clients',
-				'Created reusable component libraries used across multiple projects',
-				'Introduced TypeScript adoption improving code quality and DX'
+				'Improved and refactored existing frontend interfaces for better usability and responsiveness',
+				'Integrated frontend applications with backend REST APIs',
+				'Fixed UI inconsistencies and optimized layouts across multiple devices'
+			]
+		},
+		{
+			role: 'Fullstack Developer Intern',
+			company: 'Infinite Learning Indonesia',
+			duration: 'Feb 2024 - Jul 2024',
+			contributions: [
+				'Developed a florist e-commerce web application during the MSIB internship program',
+				'Built responsive frontend components and backend CRUD features',
+				'Collaborated with team members using Git and Agile-based workflows'
 			]
 		}
 	]
@@ -49,7 +49,7 @@
 	</div>
 
 	<div class="mt-12 space-y-0">
-		{#each experiences as experience (experience.role)}
+		{#each experiences as experience (experience.company)}
 			<div class="relative pb-12 pl-8 last:pb-0">
 				<div class="absolute top-2 left-0 h-full w-0.5 bg-gray-400"></div>
 
