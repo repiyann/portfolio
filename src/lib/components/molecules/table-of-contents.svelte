@@ -87,7 +87,7 @@
 					<li style="margin-left: {(heading.level - 2) * 12}px">
 						<button
 							onclick={() => handleNavigation(heading.id)}
-							class="block w-full truncate text-left text-sm transition-colors duration-200 py-1"
+							class="block w-full truncate py-1 text-left text-sm transition-colors duration-200"
 							class:font-semibold={activeId === heading.id}
 							class:text-primary={activeId === heading.id}
 							class:text-muted-foreground={activeId !== heading.id}
@@ -104,7 +104,7 @@
 </div>
 
 <!-- Desktop Sticky TOC -->
-<aside class="hidden md:block sticky top-20 h-fit">
+<aside class="sticky top-20 hidden h-fit md:block">
 	<div class="space-y-1 text-sm">
 		<h3 class="mb-4 font-semibold text-foreground">On this page</h3>
 		<nav class="max-h-[calc(100vh-120px)] overflow-y-auto pr-2">
@@ -113,13 +113,11 @@
 					<li style="margin-left: {(heading.level - 2) * 12}px">
 						<button
 							onclick={() => handleNavigation(heading.id)}
-							class="block w-full truncate px-2 py-1.5 text-left text-sm transition-colors duration-200 rounded"
-							class:font-semibold={activeId === heading.id}
-							class:text-primary={activeId === heading.id}
-							class:bg-primary/10={activeId === heading.id}
-							class:text-muted-foreground={activeId !== heading.id}
-							class:hover:text-foreground={activeId !== heading.id}
-							class:hover:bg-muted/50={activeId !== heading.id}
+							class={`block w-full truncate rounded px-2 py-1.5 text-left text-sm transition-colors duration-200 ${
+								activeId === heading.id
+									? 'bg-primary/10 font-semibold text-primary'
+									: 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+							}`}
 							title={heading.text}
 						>
 							{heading.text}
@@ -130,4 +128,3 @@
 		</nav>
 	</div>
 </aside>
-
