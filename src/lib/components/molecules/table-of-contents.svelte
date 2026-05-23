@@ -71,26 +71,28 @@
 <div class="md:hidden">
 	<button
 		onclick={toggleTOC}
-		class="mb-6 flex w-full items-center justify-between rounded-lg border border-border bg-muted/50 px-4 py-3 font-semibold text-foreground transition-colors hover:bg-muted"
+		class="sticky top-0 z-40 mb-6 flex w-full items-center justify-between rounded-lg border border-border bg-background px-4 py-3 font-semibold text-foreground transition-all hover:border-primary/30 hover:bg-muted/50"
 	>
-		<span>Table of Contents</span>
+		<span>On this page</span>
 		<IconChevronRight
 			class="size-4 transition-transform duration-200"
-			style={`transform: rotate(${isOpen ? 90 : 0}deg)`}		
+			style={`transform: rotate(${isOpen ? 90 : 0}deg)`}
 		/>
 	</button>
 
 	{#if isOpen && headings.length > 0}
 		<nav class="mb-8 rounded-lg border border-border bg-muted/30 p-4">
-			<ul class="space-y-2">
+			<ul class="space-y-1">
 				{#each headings as heading (heading.id)}
-					<li style="margin-left: {(heading.level - 2) * 16}px">
+					<li style="margin-left: {(heading.level - 2) * 12}px">
 						<button
 							onclick={() => handleNavigation(heading.id)}
-							class="text-left text-sm transition-colors"
+							class="block w-full truncate text-left text-sm transition-colors duration-200 py-1"
 							class:font-semibold={activeId === heading.id}
 							class:text-primary={activeId === heading.id}
 							class:text-muted-foreground={activeId !== heading.id}
+							class:hover:text-foreground={activeId !== heading.id}
+							title={heading.text}
 						>
 							{heading.text}
 						</button>
@@ -102,30 +104,30 @@
 </div>
 
 <!-- Desktop Sticky TOC -->
-<div class="hidden md:block">
-	<aside class="sticky top-20 max-h-[calc(100vh-80px)] overflow-y-auto">
-		<div class="space-y-1 text-sm">
-			<h3 class="mb-4 font-semibold text-foreground">On this page</h3>
-			<nav>
-				<ul class="space-y-1">
-					{#each headings as heading (heading.id)}
-						<li style="margin-left: {(heading.level - 2) * 12}px">
-							<button
-								onclick={() => handleNavigation(heading.id)}
-								class="block w-full truncate px-2 py-1.5 text-left transition-colors"
-								class:font-semibold={activeId === heading.id}
-								class:text-primary={activeId === heading.id}
-								class:text-muted-foreground={activeId !== heading.id}
-								class:hover:text-foreground={activeId !== heading.id}
-								title={heading.text}
-							>
-								{heading.text}
-							</button>
-						</li>
-					{/each}
-				</ul>
-			</nav>
-		</div>
-	</aside>
-</div>
+<aside class="hidden md:block sticky top-20 h-fit">
+	<div class="space-y-1 text-sm">
+		<h3 class="mb-4 font-semibold text-foreground">On this page</h3>
+		<nav class="max-h-[calc(100vh-120px)] overflow-y-auto pr-2">
+			<ul class="space-y-0.5">
+				{#each headings as heading (heading.id)}
+					<li style="margin-left: {(heading.level - 2) * 12}px">
+						<button
+							onclick={() => handleNavigation(heading.id)}
+							class="block w-full truncate px-2 py-1.5 text-left text-sm transition-colors duration-200 rounded"
+							class:font-semibold={activeId === heading.id}
+							class:text-primary={activeId === heading.id}
+							class:bg-primary/10={activeId === heading.id}
+							class:text-muted-foreground={activeId !== heading.id}
+							class:hover:text-foreground={activeId !== heading.id}
+							class:hover:bg-muted/50={activeId !== heading.id}
+							title={heading.text}
+						>
+							{heading.text}
+						</button>
+					</li>
+				{/each}
+			</ul>
+		</nav>
+	</div>
+</aside>
 
