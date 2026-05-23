@@ -76,7 +76,7 @@
 		<span>Table of Contents</span>
 		<IconChevronRight
 			class="size-4 transition-transform duration-200"
-			style="transform: rotate({isOpen ? 90 : 0}deg)"
+			style={`transform: rotate(${isOpen ? 90 : 0}deg)`}		
 		/>
 	</button>
 
