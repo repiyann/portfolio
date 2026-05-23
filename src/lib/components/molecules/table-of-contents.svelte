@@ -26,17 +26,37 @@
 				level: parseInt(heading.tagName[1])
 			}))
 
+		// Set initial active ID to first heading
+		if (headings.length > 0) {
+			activeId = headings[0].id
+		}
+
 		// Set up intersection observer for scroll tracking
+		// Track which headings are visible in viewport
+		const visibleHeadings = new Set()
 		const observer = new IntersectionObserver(
 			(entries) => {
 				entries.forEach((entry) => {
 					if (entry.isIntersecting) {
-						activeId = entry.target.id
+						visibleHeadings.add(entry.target.id)
+					} else {
+						visibleHeadings.delete(entry.target.id)
 					}
 				})
+
+				// Set active to the first visible heading (top-most)
+				if (visibleHeadings.size > 0) {
+					const visibleArray = Array.from(visibleHeadings)
+					const firstVisible = h2s.find((h) => visibleArray.includes(h.id))
+					if (firstVisible) {
+						activeId = firstVisible.id
+					}
+				}
 			},
 			{
-				rootMargin: '-50% 0px -50% 0px'
+				// Trigger when heading enters top 30% of viewport
+				rootMargin: '0px 0px -70% 0px',
+				threshold: 0
 			}
 		)
 
@@ -67,31 +87,33 @@
 	}
 </script>
 
-<!-- Mobile Collapsible TOC -->
-<div class="md:hidden">
+<!-- Mobile Sticky TOC -->
+<div class="sticky top-0 z-50 md:hidden bg-background/95 backdrop-blur-sm border-b border-border">
 	<button
 		onclick={toggleTOC}
-		class="sticky top-0 z-40 mb-6 flex w-full items-center justify-between rounded-lg border border-border bg-background px-4 py-3 font-semibold text-foreground transition-all hover:border-primary/30 hover:bg-muted/50"
+		class="w-full flex items-center justify-between px-4 py-3 font-semibold text-foreground hover:bg-muted/50 transition-colors"
 	>
 		<span>On this page</span>
 		<IconChevronRight
-			class="size-4 transition-transform duration-200"
+			class="size-4 transition-transform duration-300"
 			style={`transform: rotate(${isOpen ? 90 : 0}deg)`}
 		/>
 	</button>
 
 	{#if isOpen && headings.length > 0}
-		<nav class="mb-8 rounded-lg border border-border bg-muted/30 p-4">
-			<ul class="space-y-1">
+		<nav class="border-t border-border bg-muted/30 max-h-[60vh] overflow-y-auto">
+			<ul class="space-y-0">
 				{#each headings as heading (heading.id)}
-					<li style="margin-left: {(heading.level - 2) * 12}px">
+					<li>
 						<button
 							onclick={() => handleNavigation(heading.id)}
-							class="block w-full truncate py-1 text-left text-sm transition-colors duration-200"
+							class="w-full text-left text-sm transition-colors duration-200 py-2 px-4 hover:bg-muted/50 border-l-2"
+							class:border-primary={activeId === heading.id}
+							class:border-transparent={activeId !== heading.id}
 							class:font-semibold={activeId === heading.id}
 							class:text-primary={activeId === heading.id}
 							class:text-muted-foreground={activeId !== heading.id}
-							class:hover:text-foreground={activeId !== heading.id}
+							style={`padding-left: calc(1rem + ${(heading.level - 2) * 12}px)`}
 							title={heading.text}
 						>
 							{heading.text}
@@ -103,24 +125,25 @@
 	{/if}
 </div>
 
-<!-- Desktop Sticky TOC -->
-<aside class="sticky top-20 hidden h-fit md:block">
-	<div class="space-y-1 text-sm">
-		<h3 class="mb-4 font-semibold text-foreground">On this page</h3>
-		<nav class="max-h-[calc(100vh-120px)] overflow-y-auto pr-2">
-			<ul class="space-y-0.5">
+<!-- Desktop Sticky TOC Sidebar -->
+<aside class="hidden md:block sticky top-4">
+	<div class="space-y-3 text-sm pr-4">
+		<h3 class="font-semibold text-foreground text-xs uppercase tracking-wider">On this page</h3>
+		<nav class="flex flex-col max-h-[calc(100vh-80px)] overflow-y-auto">
+			<ul class="space-y-1">
 				{#each headings as heading (heading.id)}
-					<li style="margin-left: {(heading.level - 2) * 12}px">
-						<button
-							onclick={() => handleNavigation(heading.id)}
-							class={`block w-full truncate rounded px-2 py-1.5 text-left text-sm transition-colors duration-200 ${
-								activeId === heading.id
-									? 'bg-primary/10 font-semibold text-primary'
-									: 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
-							}`}
-							title={heading.text}
-						>
-							{heading.text}
+					<li>
+					<button
+						onclick={() => handleNavigation(heading.id)}
+						class={`w-full text-left text-xs transition-all duration-200 py-1.5 px-2.5 rounded-sm border-l-2 ${
+							activeId === heading.id
+								? 'border-primary font-semibold text-primary bg-primary/5'
+								: 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
+						}`}
+						style={`padding-left: calc(0.625rem + ${(heading.level - 2) * 10}px)`}
+						title={heading.text}
+					>
+							<div class="truncate">{heading.text}</div>
 						</button>
 					</li>
 				{/each}
