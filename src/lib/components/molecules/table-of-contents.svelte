@@ -139,7 +139,7 @@
 	}
 
 	aside::-webkit-scrollbar-thumb {
-		background: hsl(var(--muted-foreground));
+		background: hsl(var(--muted-foreground) / 0.5);
 		border-radius: 3px;
 	}
 
