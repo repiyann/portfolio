@@ -147,6 +147,11 @@
 	url="https://r3p.dev/blogs/{post.slug}"
 	ogImage="https://r3p.dev/og-image.png"
 >
+	<!-- Mobile TOC (appears before content on small screens) -->
+	<div class="mb-8 md:hidden">
+		<TableOfContents />
+	</div>
+
 	<div class="grid grid-cols-1 gap-8 lg:grid-cols-4">
 		<!-- Main Content -->
 		<article class="space-y-12 lg:col-span-3">
@@ -216,9 +221,9 @@
 			</footer>
 		</article>
 
-		<!-- Table of Contents Sidebar -->
-		<aside class="lg:col-span-1">
+		<!-- Desktop TOC Sidebar -->
+		<div class="hidden lg:block lg:col-span-1">
 			<TableOfContents />
-		</aside>
+		</div>
 	</div>
 </AppLayout>
