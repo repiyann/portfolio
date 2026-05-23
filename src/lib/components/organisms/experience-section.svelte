@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '../ui/collapsible'
+	import { IconChevronRight } from '@tabler/icons-svelte'
 
 	interface Experience {
 		role: string
@@ -40,6 +40,12 @@
 			]
 		}
 	]
+
+	let openIndex: number | null = $state(null)
+
+	function toggleAccordion(index: number) {
+		openIndex = openIndex === index ? null : index
+	}
 </script>
 
 <section class="py-5">
@@ -83,28 +89,37 @@
 
 	<!-- Mobile accordion view (shown only on mobile) -->
 	<div class="mt-12 space-y-3 md:hidden">
-		{#each experiences as experience (experience.company)}
-			<Collapsible>
-				<CollapsibleTrigger class="justify-between">
+		{#each experiences as experience, index (experience.company)}
+			<div class="overflow-hidden rounded-lg border border-border">
+				<button
+					onclick={() => toggleAccordion(index)}
+					class="flex w-full items-center justify-between bg-transparent px-4 py-3 text-left font-semibold text-foreground transition-colors hover:bg-muted hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+					type="button"
+				>
 					<div class="flex flex-col gap-1">
 						<span class="font-semibold text-foreground">{experience.role}</span>
 						<span class="text-sm text-muted-foreground">{experience.company}</span>
 					</div>
-				</CollapsibleTrigger>
-				<CollapsibleContent>
-					<div class="space-y-2">
+					<IconChevronRight
+						class="size-4 shrink-0 transition-transform duration-200"
+						style="transform: rotate({openIndex === index ? 90 : 0}deg)"
+					/>
+				</button>
+
+				{#if openIndex === index}
+					<div class="space-y-2 border-t border-border px-4 py-3">
 						<p class="text-xs text-muted-foreground">{experience.duration}</p>
 						<ul class="space-y-2">
 							{#each experience.contributions as contribution (contribution)}
 								<li class="flex items-start gap-2 text-sm text-muted-foreground">
 									<span class="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-muted-foreground"></span>
-									{contribution}
+									<span>{contribution}</span>
 								</li>
 							{/each}
 						</ul>
 					</div>
-				</CollapsibleContent>
-			</Collapsible>
+				{/if}
+			</div>
 		{/each}
 	</div>
 </section>

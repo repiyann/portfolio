@@ -715,6 +715,404 @@ Then toggle with a class:
 
 These advanced Tailwind techniques will help you build more sophisticated, maintainable design systems. Master them and you'll unlock the full potential of Tailwind CSS in your projects.
 		`
+	},
+	{
+		id: '4',
+		slug: 'building-scalable-applications-typescript',
+		title: 'Building Scalable Applications with TypeScript: From Small Projects to Enterprise Systems',
+		description:
+			'A comprehensive guide to using TypeScript for building scalable applications, covering design patterns, architecture decisions, and production-ready practices.',
+		tags: ['TypeScript', 'Architecture', 'Scalability', 'Best Practices'],
+		datePublished: '2025-03-01',
+		readingTime: 18,
+		author: 'r3p',
+		content: `
+# Building Scalable Applications with TypeScript
+
+TypeScript has revolutionized how we build JavaScript applications. By adding static typing to the language, it enables developers to catch bugs early, write more maintainable code, and build systems that scale to thousands of lines of code without falling apart.
+
+In this comprehensive guide, we'll explore how to architect TypeScript applications from small projects through enterprise systems, focusing on patterns, practices, and principles that make codebases sustainable as they grow.
+
+## Why TypeScript for Scalable Systems?
+
+When you're building a small project, anything works. A few hundred lines of JavaScript? No problem. But as systems grow, the lack of static typing becomes a liability. Consider this scenario:
+
+\`\`\`typescript
+// Without TypeScript - Easy to miss bugs
+function processUser(user) {
+  return {
+    id: user.id,
+    email: user.email,
+    age: user.age  // Typo: should be 'age' not 'ag'
+  }
+}
+\`\`\`
+
+TypeScript catches this immediately:
+
+\`\`\`typescript
+interface User {
+  id: number
+  email: string
+  age: number
+}
+
+function processUser(user: User): User {
+  return {
+    id: user.id,
+    email: user.email,
+    age: user.age  // Type checker ensures property exists
+  }
+}
+\`\`\`
+
+## Architectural Patterns for Scalability
+
+### 1. Domain-Driven Design (DDD)
+
+Domain-Driven Design is a pattern that structures your application around your business domain. As applications scale, this becomes critical for maintaining clarity.
+
+**Key Concepts:**
+
+- **Entities**: Objects with a unique identity that persists throughout the application lifetime
+- **Value Objects**: Objects without identity, defined by their attributes
+- **Aggregates**: Groups of entities and value objects bound together by a root entity
+- **Repositories**: Abstract the data access layer from the domain model
+
+Here's a practical example:
+
+\`\`\`typescript
+// Domain Model
+namespace UserDomain {
+  export interface IRepository<T> {
+    save(entity: T): Promise<void>
+    findById(id: string): Promise<T | null>
+    findAll(): Promise<T[]>
+    delete(id: string): Promise<void>
+  }
+
+  export class UserId {
+    constructor(readonly value: string) {
+      if (!value) throw new Error('UserId cannot be empty')
+    }
+  }
+
+  export class Email {
+    constructor(readonly value: string) {
+      if (!this.isValid(value)) throw new Error('Invalid email')
+    }
+
+    private isValid(email: string): boolean {
+      return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)
+    }
+  }
+
+  export interface User {
+    id: UserId
+    email: Email
+    name: string
+    createdAt: Date
+    updatedAt: Date
+  }
+
+  export class UserRepository implements IRepository<User> {
+    async save(user: User): Promise<void> {
+      // Persist to database
+    }
+
+    async findById(id: string): Promise<User | null> {
+      // Query database
+      return null
+    }
+
+    async findAll(): Promise<User[]> {
+      // Query database
+      return []
+    }
+
+    async delete(id: string): Promise<void> {
+      // Delete from database
+    }
+  }
+}
+\`\`\`
+
+### 2. Dependency Injection (DI)
+
+As applications grow, managing dependencies becomes complex. Dependency Injection makes your code testable and flexible.
+
+\`\`\`typescript
+// Without DI - Hard to test
+class UserService {
+  private database = new Database()
+
+  async getUser(id: string) {
+    return this.database.query('SELECT * FROM users WHERE id = ?', [id])
+  }
+}
+
+// With DI - Testable and flexible
+interface IDatabase {
+  query<T>(sql: string, params: any[]): Promise<T[]>
+}
+
+class UserService {
+  constructor(private database: IDatabase) {}
+
+  async getUser(id: string) {
+    return this.database.query('SELECT * FROM users WHERE id = ?', [id])
+  }
+}
+
+// In tests, you can inject a mock
+class MockDatabase implements IDatabase {
+  async query<T>() {
+    return [{ id: '1', name: 'John' }]
+  }
+}
+
+const service = new UserService(new MockDatabase())
+\`\`\`
+
+### 3. Event-Driven Architecture
+
+For large systems handling complex workflows, event-driven architecture decouples components and enables system-wide consistency.
+
+\`\`\`typescript
+// Event definitions
+interface DomainEvent {
+  aggregateId: string
+  timestamp: Date
+  version: number
+}
+
+class UserCreatedEvent implements DomainEvent {
+  constructor(
+    readonly aggregateId: string,
+    readonly email: string,
+    readonly name: string,
+    readonly timestamp: Date,
+    readonly version: number
+  ) {}
+}
+
+// Event emitter
+class EventBus {
+  private handlers = new Map<string, Set<(event: DomainEvent) => Promise<void>>>()
+
+  subscribe(eventType: string, handler: (event: DomainEvent) => Promise<void>) {
+    if (!this.handlers.has(eventType)) {
+      this.handlers.set(eventType, new Set())
+    }
+    this.handlers.get(eventType)!.add(handler)
+  }
+
+  async publish(event: DomainEvent) {
+    const handlers = this.handlers.get(event.constructor.name)
+    if (handlers) {
+      await Promise.all([...handlers].map((h) => h(event)))
+    }
+  }
+}
+
+// Usage
+const eventBus = new EventBus()
+
+eventBus.subscribe('UserCreatedEvent', async (event: DomainEvent) => {
+  if (event instanceof UserCreatedEvent) {
+    console.log(\`Send welcome email to \${event.email}\`)
+  }
+})
+
+await eventBus.publish(
+  new UserCreatedEvent('user-123', 'john@example.com', 'John', new Date(), 1)
+)
+\`\`\`
+
+## Managing Type Safety at Scale
+
+### Branded Types
+
+Branded types create a distinct type from primitive types, preventing accidental mixing:
+
+\`\`\`typescript
+type UserId = string & { readonly __brand: 'UserId' }
+type Email = string & { readonly __brand: 'Email' }
+
+function createUserId(id: string): UserId {
+  return id as UserId
+}
+
+function createEmail(email: string): Email {
+  if (!email.includes('@')) throw new Error('Invalid email')
+  return email as Email
+}
+
+function findUser(id: UserId) {
+  // Now it's impossible to pass a regular string or Email
+}
+
+// This will not compile:
+// findUser('some-id') // Error
+// findUser(myEmail) // Error
+
+// This works:
+const userId = createUserId('123')
+findUser(userId) // OK
+\`\`\`
+
+### Const Assertions for Immutability
+
+\`\`\`typescript
+// Without const assertion - types could change
+const config = {
+  apiUrl: 'https://api.example.com',
+  timeout: 5000,
+  retries: 3
+}
+// config.apiUrl is string (not https://api.example.com)
+
+// With const assertion - literal types preserved
+const config = {
+  apiUrl: 'https://api.example.com',
+  timeout: 5000,
+  retries: 3
+} as const
+// config.apiUrl is "https://api.example.com" (literal type)
+\`\`\`
+
+## Error Handling at Scale
+
+Proper error handling is crucial for scalable systems. Use discriminated unions for type-safe error handling:
+
+\`\`\`typescript
+type Result<T, E> = { status: 'success'; data: T } | { status: 'error'; error: E }
+
+class ValidationError extends Error {
+  constructor(readonly field: string, message: string) {
+    super(message)
+  }
+}
+
+class NotFoundError extends Error {
+  constructor(readonly resource: string, readonly id: string) {
+    super(\`\${resource} with id \${id} not found\`)
+  }
+}
+
+async function createUser(email: string, name: string): Promise<Result<User, ValidationError | Error>> {
+  if (!email.includes('@')) {
+    return {
+      status: 'error',
+      error: new ValidationError('email', 'Invalid email format')
+    }
+  }
+
+  // Create user...
+  return {
+    status: 'success',
+    data: user
+  }
+}
+
+// Type-safe error handling
+const result = await createUser('john@example.com', 'John')
+
+if (result.status === 'error') {
+  if (result.error instanceof ValidationError) {
+    console.log(\`Validation failed for \${result.error.field}\`)
+  } else {
+    console.log('Unknown error')
+  }
+} else {
+  console.log('User created:', result.data)
+}
+\`\`\`
+
+## Testing Strategies for Scalable Codebases
+
+### Unit Testing with Dependency Injection
+
+\`\`\`typescript
+describe('UserService', () => {
+  it('should retrieve user by id', async () => {
+    // Arrange
+    const mockDatabase: IDatabase = {
+      query: jest.fn().mockResolvedValue([{ id: '1', name: 'John' }])
+    }
+    const service = new UserService(mockDatabase)
+
+    // Act
+    const user = await service.getUser('1')
+
+    // Assert
+    expect(user).toEqual({ id: '1', name: 'John' })
+    expect(mockDatabase.query).toHaveBeenCalledWith(
+      'SELECT * FROM users WHERE id = ?',
+      ['1']
+    )
+  })
+})
+\`\`\`
+
+### Integration Testing
+
+\`\`\`typescript
+describe('User Creation Flow', () => {
+  it('should create user and emit event', async () => {
+    const eventBus = new EventBus()
+    const eventHandler = jest.fn()
+    
+    eventBus.subscribe('UserCreatedEvent', eventHandler)
+    
+    const service = new UserService(realDatabase, eventBus)
+    const user = await service.createUser('john@example.com', 'John')
+    
+    expect(eventHandler).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: 'john@example.com'
+      })
+    )
+  })
+})
+\`\`\`
+
+## Performance Considerations
+
+### Lazy Loading with Generics
+
+\`\`\`typescript
+class Repository<T> {
+  private cache = new Map<string, T>()
+
+  async load(id: string, loader: () => Promise<T>): Promise<T> {
+    if (this.cache.has(id)) {
+      return this.cache.get(id)!
+    }
+
+    const item = await loader()
+    this.cache.set(id, item)
+    return item
+  }
+
+  invalidate(id: string) {
+    this.cache.delete(id)
+  }
+}
+\`\`\`
+
+## Conclusion
+
+Building scalable applications with TypeScript is about more than just adding types. It's about adopting patterns and practices that enable your codebase to grow sustainably. Focus on:
+
+1. **Clear Domain Models** - Let your business logic drive your code structure
+2. **Dependency Injection** - Make everything testable and flexible
+3. **Type Safety** - Use TypeScript's advanced features to prevent entire categories of bugs
+4. **Event-Driven Design** - Decouple components for better maintainability
+5. **Comprehensive Testing** - Build confidence in your system as it grows
+
+As your application scales from a small project to an enterprise system, these practices will keep your codebase maintainable, testable, and robust.
+		`
 	}
 ]
 

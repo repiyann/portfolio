@@ -2,6 +2,7 @@
 	import { page } from '$app/stores'
 	import AppLayout from '$lib/components/layouts/app-layout.svelte'
 	import { Badge } from '$lib/components/ui/badge'
+	import TableOfContents from '$lib/components/molecules/table-of-contents.svelte'
 	import { getBlog } from '$lib/data/blogs'
 	import { IconArrowLeft, IconClock, IconCalendar } from '@tabler/icons-svelte'
 
@@ -21,46 +22,122 @@
 	}
 
 	function renderContent(content: string): string {
-		let html = content
+		const lines = content.split('\n')
+		const result: string[] = []
+		let inCodeBlock = false
+		let codeContent: string[] = []
+		let codeLanguage = ''
 
-		// Split by lines and process
-		const lines = html.split('\n').map((line) => {
+		for (let i = 0; i < lines.length; i++) {
+			const line = lines[i]
 			const trimmed = line.trim()
+
+			// Handle code blocks
+			if (trimmed.startsWith('```')) {
+				if (!inCodeBlock) {
+					inCodeBlock = true
+					codeLanguage = trimmed.slice(3).trim()
+					codeContent = []
+				} else {
+					inCodeBlock = false
+					const code = codeContent.join('\n').trim()
+					const escaped = code
+						.replace(/&/g, '&amp;')
+						.replace(/</g, '&lt;')
+						.replace(/>/g, '&gt;')
+					result.push(
+						`<div class="my-6 rounded-lg border border-border bg-muted/50 overflow-hidden">` +
+						`<div class="flex items-center justify-between bg-muted px-4 py-2 text-xs text-muted-foreground">` +
+						`<span>${codeLanguage || 'code'}</span>` +
+						`</div>` +
+						`<pre class="overflow-x-auto p-4"><code class="text-sm font-mono text-muted-foreground">${escaped}</code></pre>` +
+						`</div>`
+					)
+				}
+				continue
+			}
+
+			if (inCodeBlock) {
+				codeContent.push(line)
+				continue
+			}
 
 			// Headings
 			if (trimmed.startsWith('# ')) {
-				return `<h2 class="mt-8 mb-4 text-2xl font-bold tracking-tight text-foreground">${trimmed.slice(2)}</h2>`
+				const id = slugify(trimmed.slice(2))
+				result.push(
+					`<h2 id="${id}" class="mt-12 mb-4 text-2xl font-bold tracking-tight text-foreground scroll-mt-20">${trimmed.slice(2)}</h2>`
+				)
+				continue
 			} else if (trimmed.startsWith('## ')) {
-				return `<h3 class="mt-6 mb-3 text-xl font-semibold text-foreground">${trimmed.slice(3)}</h3>`
+				const id = slugify(trimmed.slice(3))
+				result.push(
+					`<h3 id="${id}" class="mt-8 mb-3 text-xl font-semibold text-foreground scroll-mt-20">${trimmed.slice(3)}</h3>`
+				)
+				continue
 			} else if (trimmed.startsWith('### ')) {
-				return `<h4 class="mt-4 mb-2 text-lg font-semibold text-foreground">${trimmed.slice(4)}</h4>`
-			}
-
-			// Code blocks
-			if (trimmed.startsWith('```')) {
-				return '<div class="relative my-4 rounded-lg border border-border bg-muted p-4 overflow-x-auto"><code class="text-sm font-mono text-muted-foreground">'
-			}
-
-			// Lists
-			if (trimmed.startsWith('- ')) {
-				return `<li class="flex items-start gap-2 ml-4 text-muted-foreground"><span class="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-primary flex-shrink-0"></span><span>${trimmed.slice(2)}</span></li>`
+				const id = slugify(trimmed.slice(4))
+				result.push(
+					`<h4 id="${id}" class="mt-6 mb-2 text-lg font-semibold text-foreground scroll-mt-20">${trimmed.slice(4)}</h4>`
+				)
+				continue
 			}
 
 			// Blockquotes
 			if (trimmed.startsWith('> ')) {
-				return `<blockquote class="my-4 border-l-4 border-primary pl-4 italic text-muted-foreground">${trimmed.slice(2)}</blockquote>`
+				result.push(
+					`<blockquote class="my-6 border-l-4 border-primary bg-primary/5 py-3 pl-4 italic text-muted-foreground">${trimmed.slice(2)}</blockquote>`
+				)
+				continue
+			}
+
+			// Lists - detect start
+			if (trimmed.startsWith('- ') || /^\d+\.\s/.test(trimmed)) {
+				const listItems: string[] = []
+				let isOrdered = /^\d+\.\s/.test(trimmed)
+				let j = i
+
+				while (j < lines.length) {
+					const currentLine = lines[j].trim()
+					if (!currentLine) break
+					if (!currentLine.startsWith('- ') && !/^\d+\.\s/.test(currentLine)) break
+
+					listItems.push(currentLine.replace(/^[-*]\s+|\d+\.\s+/, ''))
+					j++
+				}
+
+				result.push(renderList(listItems, isOrdered ? 'ol' : 'ul'))
+				i = j - 1
+				continue
 			}
 
 			// Empty lines
 			if (trimmed === '') {
-				return '<div class="h-2"></div>'
+				continue
 			}
 
 			// Paragraphs
-			return `<p class="mb-3 leading-relaxed text-muted-foreground">${trimmed}</p>`
-		})
+			result.push(`<p class="mb-4 leading-relaxed text-muted-foreground">${trimmed}</p>`)
+		}
 
-		return lines.join('')
+		return result.join('')
+	}
+
+	function slugify(text: string): string {
+		return text
+			.toLowerCase()
+			.replace(/[^\w\s-]/g, '')
+			.replace(/\s+/g, '-')
+			.replace(/-+/g, '-')
+	}
+
+	function renderList(items: string[], type: 'ul' | 'ol' = 'ul'): string {
+		const tag = type === 'ol' ? 'ol' : 'ul'
+		const itemClass = type === 'ol' ? 'list-decimal' : 'list-disc'
+		const listMarkup = items
+			.map((item) => `<li class="mb-2 text-muted-foreground">${item}</li>`)
+			.join('')
+		return `<${tag} class="${itemClass} mb-4 ml-6 space-y-2">${listMarkup}</${tag}>`
 	}
 </script>
 
@@ -70,7 +147,9 @@
 	url="https://r3p.dev/blogs/{post.slug}"
 	ogImage="https://r3p.dev/og-image.png"
 >
-	<article class="space-y-12">
+	<div class="grid grid-cols-1 gap-8 lg:grid-cols-4">
+		<!-- Main Content -->
+		<article class="space-y-12 lg:col-span-3">
 		<!-- Back Button -->
 		<a
 			href="/blogs"
@@ -126,14 +205,20 @@
 			</div>
 		</div>
 
-		<!-- Footer -->
-		<footer class="border-t border-border pt-8">
-			<a
-				href="/blogs"
-				class="inline-flex items-center gap-2 font-medium text-primary transition-colors hover:text-primary/80"
-			>
-				← Back to all articles
-			</a>
-		</footer>
-	</article>
+			<!-- Footer -->
+			<footer class="border-t border-border pt-8">
+				<a
+					href="/blogs"
+					class="inline-flex items-center gap-2 font-medium text-primary transition-colors hover:text-primary/80"
+				>
+					← Back to all articles
+				</a>
+			</footer>
+		</article>
+
+		<!-- Table of Contents Sidebar -->
+		<aside class="lg:col-span-1">
+			<TableOfContents />
+		</aside>
+	</div>
 </AppLayout>
