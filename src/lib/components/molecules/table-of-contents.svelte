@@ -129,21 +129,3 @@
 	</aside>
 </div>
 
-<style>
-	aside::-webkit-scrollbar {
-		width: 6px;
-	}
-
-	aside::-webkit-scrollbar-track {
-		background: transparent;
-	}
-
-	aside::-webkit-scrollbar-thumb {
-		background: hsl(var(--muted-foreground) / 0.5);
-		border-radius: 3px;
-	}
-
-	aside::-webkit-scrollbar-thumb:hover {
-		background: hsl(var(--foreground));
-	}
-</style>
